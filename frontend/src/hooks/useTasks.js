@@ -10,6 +10,7 @@ export function useTasks(query, status, page, pageSize) {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setError(null);
 
     fetchTasks({ query, status, page, pageSize })
       .then((data) => {
@@ -21,6 +22,7 @@ export function useTasks(query, status, page, pageSize) {
       .catch((err) => {
         if (!active) return;
         setError(err.message);
+        setLoading(false);
       });
 
     return () => {
