@@ -39,9 +39,22 @@ CREATE OR REPLACE PACKAGE BODY task_search_pkg AS
         p_results     OUT task_cursor,
         p_total_count OUT NUMBER
     ) IS
-        v_term   VARCHAR2(257);
+        v_term   VARCHAR2(1002 CHAR);
         v_offset NUMBER;
     BEGIN
+        IF p_page IS NULL OR p_page < 1 OR p_page != TRUNC(p_page) THEN
+            RAISE_APPLICATION_ERROR(-20001, 'p_page must be a positive integer');
+        END IF;
+
+        IF p_page_size IS NULL OR p_page_size < 1 OR p_page_size > 100
+           OR p_page_size != TRUNC(p_page_size) THEN
+            RAISE_APPLICATION_ERROR(-20002, 'p_page_size must be an integer between 1 and 100');
+        END IF;
+
+        IF LENGTH(p_search_term) > 1000 THEN
+            RAISE_APPLICATION_ERROR(-20003, 'p_search_term must not exceed 1000 characters');
+        END IF;
+
         v_term   := '%' || LOWER(NVL(p_search_term, '')) || '%';
         v_offset := (p_page - 1) * p_page_size;
 
